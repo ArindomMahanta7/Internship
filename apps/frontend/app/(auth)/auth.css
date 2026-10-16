@@ -1,0 +1,424 @@
+/*
+ * BuyCart auth screens (login / register / verify) - modern dark glass look.
+ * Shared by every page under app/(auth), scoped with a `buycart-` prefix so it
+ * never leaks into the rest of the app.
+ */
+
+.buycart-page {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 32px 16px;
+  overflow: hidden;
+  color: #e6edf6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #070b12;
+  background-image:
+    radial-gradient(700px circle at 12% -8%, rgba(37, 99, 235, 0.22), transparent 62%),
+    radial-gradient(620px circle at 88% 108%, rgba(14, 165, 233, 0.16), transparent 62%),
+    linear-gradient(180deg, #070b12 0%, #0a1220 48%, #0b1728 100%);
+}
+
+/* ---------- interactive droplet backdrop ---------- */
+
+.buycart-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* soft light that follows the cursor */
+.buycart-backdrop__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 25%),
+    rgba(96, 165, 250, 0.16),
+    transparent 65%
+  );
+  transition: opacity 0.4s ease;
+  opacity: var(--glow-opacity, 0.6);
+}
+
+.buycart-droplet {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: radial-gradient(
+    circle at 32% 28%,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.1) 44%,
+    rgba(255, 255, 255, 0.02) 72%
+  );
+  box-shadow:
+    inset 0 -6px 12px rgba(96, 165, 250, 0.16),
+    inset 0 2px 4px rgba(255, 255, 255, 0.12),
+    0 6px 20px rgba(0, 0, 0, 0.3);
+  opacity: calc(var(--base-opacity, 0.6) + var(--glow, 0) * 0.4);
+  will-change: transform;
+}
+
+/* ---------- content sits above the backdrop ---------- */
+
+.buycart-shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 380px;
+}
+
+/* ---------- brand ---------- */
+
+.buycart-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.buycart-title {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #ffffff 25%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 6px 20px rgba(59, 130, 246, 0.35));
+}
+
+/* ---------- frosted panel ---------- */
+
+.buycart-panel {
+  padding: 24px 20px;
+  border-radius: 24px;
+  background: rgba(17, 24, 39, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+}
+
+.buycart-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* slightly tighter rhythm when the form has more fields */
+.buycart-form--dense {
+  gap: 10px;
+}
+
+/* ---------- inputs ---------- */
+
+.buycart-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.buycart-field:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.buycart-field:focus-within {
+  border-color: rgba(96, 165, 250, 0.6);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+
+.buycart-field svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: rgba(230, 237, 246, 0.42);
+  transition: fill 0.15s ease;
+}
+
+.buycart-field:focus-within svg {
+  fill: rgba(147, 197, 253, 0.9);
+}
+
+.buycart-field input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  color: #e6edf6;
+}
+
+.buycart-field input::placeholder {
+  color: rgba(230, 237, 246, 0.36);
+}
+
+/* autofill in dark mode: override the browser's white background */
+.buycart-field input:-webkit-autofill,
+.buycart-field input:-webkit-autofill:hover,
+.buycart-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #e6edf6;
+  caret-color: #e6edf6;
+  transition: background-color 9999s ease-out;
+}
+
+.buycart-error {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fca5a5;
+  text-align: center;
+}
+
+/* ---------- buttons ---------- */
+
+.buycart-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  border-radius: 14px;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+
+.buycart-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45);
+}
+
+.buycart-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buycart-btn--primary {
+  height: 52px;
+  margin-top: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+}
+
+.buycart-btn--primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #4a8cf8 0%, #2b6fe6 100%);
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.45);
+  transform: translateY(-1px);
+}
+
+.buycart-btn--primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.buycart-btn--oauth {
+  height: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e6edf6;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.buycart-btn--oauth:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.buycart-btn--oauth:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.buycart-btn__icon {
+  position: absolute;
+  left: 16px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+}
+
+.buycart-btn__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.buycart-btn__icon--apple svg {
+  fill: #f5f7fa;
+}
+
+/* ---------- remember me / forgot password ---------- */
+
+.buycart-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.buycart-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(230, 237, 246, 0.85);
+  cursor: pointer;
+}
+
+/* multi-line label (e.g. the terms opt-in): pin the box to the first line */
+.buycart-check--top {
+  align-items: flex-start;
+}
+
+.buycart-check--top .buycart-check__box {
+  margin-top: 1px;
+}
+
+.buycart-check input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.buycart-check__box {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.buycart-check__box svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0;
+  color: #ffffff;
+  transform: scale(0.6);
+  transition: opacity 0.12s ease, transform 0.15s ease;
+}
+
+.buycart-check input:checked + .buycart-check__box {
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.buycart-check input:checked + .buycart-check__box svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.buycart-check input:focus-visible + .buycart-check__box {
+  outline: 3px solid rgba(96, 165, 250, 0.45);
+  outline-offset: 2px;
+}
+
+.buycart-link {
+  font-weight: 700;
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.buycart-link:hover,
+.buycart-link:focus-visible {
+  text-decoration: underline;
+}
+
+/* ---------- "or" divider ---------- */
+
+.buycart-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(230, 237, 246, 0.35);
+}
+
+.buycart-divider::before,
+.buycart-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- terms + footer ---------- */
+
+.buycart-terms {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(230, 237, 246, 0.55);
+}
+
+.buycart-terms a {
+  font-weight: 600;
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.buycart-terms a:hover,
+.buycart-terms a:focus-visible {
+  text-decoration: underline;
+}
+
+.buycart-signup {
+  margin: 24px 0 0;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(230, 237, 246, 0.7);
+}
+
+@media (max-width: 380px) {
+  .buycart-title {
+    font-size: 2.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buycart-btn,
+  .buycart-check__box,
+  .buycart-check__box svg,
+  .buycart-field {
+    transition: none;
+  }
+}
