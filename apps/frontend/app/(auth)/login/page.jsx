@@ -2,107 +2,71 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import AuthBrand from "../auth-brand";
-import OAuthButtons from "../oauth-buttons";
-import DropletBackdrop from "../droplet-backdrop";
-import { PersonIcon, LockIcon, CheckIcon } from "../icons";
-import "../auth.css";
+import AuthForm from "../../../components/auth/AuthForm";
+import { PersonIcon, LockIcon, CheckIcon } from "../../../components/icons";
 
 export default function LoginPage() {
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(event) {
-    event.preventDefault();
-
-    if (!identifier.trim() || !password) {
-      setError("Please enter your email or phone number and password.");
-      return;
+  function validate(values) {
+    if (!values.identifier.trim() || !values.password) {
+      return "Please enter your email or phone number and password.";
     }
+    return null;
+  }
 
-    setError(null);
-    setSubmitting(true);
+  async function handleSubmit(values) {
     // TODO: send the credentials to the auth API once the backend is ready.
+    void values;
   }
 
   return (
-    <main className="buycart-page">
-      <DropletBackdrop />
-      <div className="buycart-shell">
-        <AuthBrand />
-
-        <section className="buycart-panel">
-          <form className="buycart-form" onSubmit={handleSubmit} noValidate>
-            <label className="buycart-field">
-              <PersonIcon />
-              <input
-                type="text"
-                name="identifier"
-                placeholder="Email or Phone Number"
-                autoComplete="username"
-                value={identifier}
-                onChange={(event) => setIdentifier(event.target.value)}
-              />
-            </label>
-
-            <label className="buycart-field">
-              <LockIcon />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </label>
-
-            {error ? (
-              <p className="buycart-error" role="alert">
-                {error}
-              </p>
-            ) : null}
-
-            <button
-              type="submit"
-              className="buycart-btn buycart-btn--primary"
-              disabled={submitting}
-            >
-              {submitting ? "Logging in…" : "Log In"}
-            </button>
-
-            <div className="buycart-row">
-              <label className="buycart-check">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(event) => setRemember(event.target.checked)}
-                />
-                <span className="buycart-check__box">
-                  <CheckIcon />
-                </span>
-                Remember Me
-              </label>
-
-              <Link href="/forgot-password" className="buycart-link">
-                Forgot Password?
-              </Link>
-            </div>
-
-            <OAuthButtons />
-          </form>
-        </section>
-
-        <p className="buycart-signup">
+    <AuthForm
+      fields={[
+        {
+          name: "identifier",
+          placeholder: "Email or Phone Number",
+          icon: PersonIcon,
+          autoComplete: "username",
+        },
+        {
+          name: "password",
+          type: "password",
+          placeholder: "Password",
+          icon: LockIcon,
+          autoComplete: "current-password",
+        },
+      ]}
+      submitLabel="Log In"
+      submittingLabel="Logging in…"
+      validate={validate}
+      onSubmit={handleSubmit}
+      footer={
+        <>
           Don&apos;t have an account?{" "}
           <Link href="/register" className="buycart-link">
             Sign Up
           </Link>
-        </p>
+        </>
+      }
+    >
+      <div className="buycart-row">
+        <label className="buycart-check">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(event) => setRemember(event.target.checked)}
+          />
+          <span className="buycart-check__box">
+            <CheckIcon />
+          </span>
+          Remember Me
+        </label>
+
+        <Link href="/forgot-password" className="buycart-link">
+          Forgot Password?
+        </Link>
       </div>
-    </main>
+    </AuthForm>
   );
 }
