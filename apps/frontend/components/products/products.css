@@ -1,0 +1,388 @@
+/*
+ * BuyCart products page styles.
+ * Two-column layout: left sidebar (title + description + filters),
+ * right content (banner + product grid with GSAP hover expand).
+ */
+
+/* ── page shell ─────────────────────────────────────────────────── */
+.products-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.products-page main {
+  flex: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 36px 24px 64px;
+}
+
+/* ── two-column body ─────────────────────────────────────────────── */
+.products-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── sidebar ─────────────────────────────────────────────────────── */
+.products-sidebar {
+  position: sticky;
+  top: 88px; /* below navbar */
+}
+.products-sidebar__title {
+  margin: 0 0 6px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.products-sidebar__desc {
+  margin: 0 0 32px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+/* filter section */
+.products-filters__heading {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.products-filters__group {
+  margin-bottom: 24px;
+}
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 12px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.filter-chip:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+.filter-chip.is-active {
+  background: rgba(59, 130, 246, 0.14);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: var(--accent-soft);
+}
+.filter-chip__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: currentColor;
+  opacity: 0.45;
+  transition: opacity 0.18s ease;
+}
+.filter-chip.is-active .filter-chip__dot {
+  opacity: 1;
+}
+.filter-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+
+/* sort select */
+.filter-select {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239fb0c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+.filter-select:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* ── right content area ──────────────────────────────────────────── */
+.products-content {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* banner */
+.products-banner {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.products-banner__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.products-banner__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(7, 11, 18, 0.75) 0%,
+    rgba(7, 11, 18, 0.1) 60%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 36px;
+  gap: 8px;
+}
+.products-banner__eyebrow {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: var(--accent-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+.products-banner__title {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.5vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1.15;
+}
+.products-banner__sub {
+  margin: 0;
+  color: rgba(230, 237, 246, 0.75);
+  font-size: 0.9rem;
+}
+
+/* ── product grid ────────────────────────────────────────────────── */
+.products-grid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.products-grid-header__label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.products-grid-header__label strong {
+  color: var(--text);
+}
+
+/* The grid uses flex so items can "squeeze" each other on hover */
+.products-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── product card ────────────────────────────────────────────────── */
+.pcard {
+  flex: 1 1 220px;
+  min-width: 0;
+  border-radius: 20px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  /* GSAP will override transform/flex-basis on hover */
+  will-change: transform, flex-grow;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+.pcard:hover {
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.45);
+}
+
+/* phone art area */
+.pcard__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 32px 0 24px;
+  background: rgba(59, 130, 246, 0.05);
+  overflow: hidden;
+}
+.pcard__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  color: #fff;
+  background: var(--accent-2);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.pcard__art-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.pcard:hover .pcard__art-glow {
+  opacity: 1;
+}
+
+/* info */
+.pcard__info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px 18px 18px;
+}
+.pcard__brand {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.pcard__name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.pcard__tagline {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+.pcard__price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+}
+.pcard__now {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.pcard__old {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.pcard__save {
+  font-size: 0.75rem;
+  color: #4ade80;
+  font-weight: 600;
+}
+.pcard__add {
+  margin: 4px 18px 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-soft);
+  font-weight: 600;
+  font-size: 0.88rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.pcard__add:hover {
+  background: rgba(59, 130, 246, 0.22);
+  color: #fff;
+}
+.pcard__add.is-added {
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+}
+
+/* entry animation state - cards start hidden */
+.pcard--entry {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* ── empty / no-results ──────────────────────────────────────────── */
+.products-empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+.products-empty svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+.products-empty p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* ── responsive ──────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .products-layout {
+    grid-template-columns: 1fr;
+  }
+  .products-sidebar {
+    position: static;
+  }
+  .products-sidebar__title {
+    font-size: 1.4rem;
+  }
+  .products-grid {
+    gap: 12px;
+  }
+  .pcard {
+    flex: 1 1 180px;
+  }
+  .products-banner {
+    height: 160px;
+  }
+}
+@media (max-width: 480px) {
+  .products-page main {
+    padding: 20px 16px 48px;
+  }
+  .pcard {
+    flex: 1 1 100%;
+  }
+}
