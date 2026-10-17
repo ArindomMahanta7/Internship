@@ -1,9 +1,9 @@
-import User from "../model/userModel.js";
+import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail.js";
-import { generateOTP, hashOTP } from "../utils/otp.js";
+import { generateOTP} from "../utils/otp.js";
 
 
 
@@ -28,12 +28,11 @@ export const registerUser = async (req, res) => {
 
         const otp = generateOTP();
 
-        const User = await User.create({
+        const newUser = await User.create({
             name,
             email: normalizedEmail,
             password: hashedPassword,
-            
-            otp: otp,
+            otp:otp,
             otpExpiry: new Date(Date.now() + 5 * 60 * 1000)
         });
 
@@ -58,9 +57,9 @@ This OTP expires in 5 minutes.`;
         }
 
         return res.status(201).json({
-            id: User._id,
-            name: User.name,
-            email: User.email,
+            id: newUser._id,
+            name: newUser.name,
+            email: newUser.email,
             message: "User registered successfully. Please check your email for the OTP."
         });
 
