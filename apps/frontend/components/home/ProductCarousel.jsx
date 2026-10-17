@@ -3,8 +3,8 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import PhoneArt from "./PhoneArt";
-import { PRODUCTS, formatPrice, formatCompact } from "../../data/products";
-import { StarIcon, ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "../icons";
+import { PRODUCTS, formatPrice } from "../../data/products";
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "../icons";
 
 /* Featured products in a horizontal, scroll-snapped carousel.
  * Client component: the arrow buttons scroll the track, and "Add to cart"
@@ -34,7 +34,7 @@ export default function ProductCarousel() {
       <div className="section__head section__head--row">
         <div>
           <h2 className="section__title">Featured phones</h2>
-          <p className="section__sub">Handpicked deals, refreshed daily.</p>
+          <p className="section__sub">Handpicked deals.</p>
         </div>
 
         <div className="products__controls">
@@ -75,12 +75,6 @@ export default function ProductCarousel() {
                 <span className="product-card__brand">{p.brand}</span>
                 <h3 className="product-card__name">{p.name}</h3>
                 <p className="product-card__tagline">{p.tagline}</p>
-
-                <div className="product-card__rating">
-                  <StarIcon />
-                  <span>{p.rating}</span>
-                  <span className="product-card__reviews">({formatCompact(p.reviews)})</span>
-                </div>
 
                 <div className="product-card__price">
                   <span className="product-card__now">{formatPrice(p.price)}</span>

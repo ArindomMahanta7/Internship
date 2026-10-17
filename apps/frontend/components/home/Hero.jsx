@@ -15,10 +15,7 @@ export default function Hero() {
             <br />
             <span className="hero__accent">at the best price.</span>
           </h1>
-          <p className="hero__subtitle">
-            Shop the latest smartphones from Nokia, Samsung, realme, Redmi and more — with fast
-            delivery, easy returns and prices you&apos;ll love.
-          </p>
+          <p className="hero__subtitle">Latest phones from top brands.</p>
 
           <div className="hero__actions">
             <Link href="/products" className="hero__btn hero__btn--primary">
@@ -38,10 +35,6 @@ export default function Hero() {
             <li>
               <strong>120+</strong>
               <span>Phones</span>
-            </li>
-            <li>
-              <strong>4.9★</strong>
-              <span>Avg. rating</span>
             </li>
           </ul>
         </div>

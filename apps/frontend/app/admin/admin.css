@@ -1,0 +1,266 @@
+/* Simple styles for the admin area. Plain CSS, no fancy stuff. */
+
+.admin {
+  display: flex;
+  min-height: 100vh;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---- sidebar ---- */
+
+.admin-sidebar {
+  width: 220px;
+  background: #111c30;
+  border-right: 1px solid #24324a;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-nav a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.admin-nav a:hover {
+  background: #1d2c47;
+  color: #ffffff;
+}
+
+.admin-back {
+  margin-top: auto;
+  color: #93c5fd;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* ---- main area ---- */
+
+.admin-main {
+  flex: 1;
+  padding: 28px 32px;
+}
+
+.admin-title {
+  margin: 0 0 20px;
+  font-size: 26px;
+  color: #ffffff;
+}
+
+.admin-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-head .admin-title {
+  margin: 0;
+}
+
+.admin-subtitle {
+  margin: 28px 0 12px;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+/* ---- stat cards ---- */
+
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.admin-card {
+  background: #16233a;
+  border: 1px solid #24324a;
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.admin-card p {
+  margin: 0 0 8px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.admin-card h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #ffffff;
+}
+
+/* ---- table ---- */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #16233a;
+  border: 1px solid #24324a;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #24324a;
+}
+
+.admin-table th {
+  background: #111c30;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table a {
+  color: #93c5fd;
+  text-decoration: none;
+}
+
+/* ---- status badges ---- */
+
+.admin-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #1d2c47;
+  color: #cbd5e1;
+}
+
+.admin-badge.green {
+  background: #14532d;
+  color: #86efac;
+}
+
+.admin-badge.blue {
+  background: #1e3a8a;
+  color: #bfdbfe;
+}
+
+.admin-badge.yellow {
+  background: #713f12;
+  color: #fde68a;
+}
+
+/* ---- links + buttons ---- */
+
+.admin-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: #93c5fd;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.admin-btn {
+  display: inline-block;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.admin-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ---- forms ---- */
+
+.admin-form {
+  background: #16233a;
+  border: 1px solid #24324a;
+  border-radius: 10px;
+  padding: 22px;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.admin-input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #24324a;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 15px;
+}
+
+.admin-message {
+  margin: 0;
+  color: #86efac;
+  font-size: 14px;
+}
+
+/* ---- simple bar chart ---- */
+
+.admin-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 16px;
+  background: #16233a;
+  border: 1px solid #24324a;
+  border-radius: 10px;
+}
+
+.admin-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-bar {
+  width: 100%;
+  background: #2563eb;
+  border-radius: 6px 6px 0 0;
+}
+
+.admin-bar-label {
+  color: #94a3b8;
+  font-size: 12px;
+}

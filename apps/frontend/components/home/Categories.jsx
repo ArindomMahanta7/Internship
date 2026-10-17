@@ -8,7 +8,7 @@ export default function Categories() {
     <section className="section categories">
       <div className="section__head">
         <h2 className="section__title">Shop by category</h2>
-        <p className="section__sub">Everything phone, in one place.</p>
+        <p className="section__sub">Every phone, one place.</p>
       </div>
 
       <div className="categories__grid">
@@ -18,7 +18,7 @@ export default function Categories() {
           </div>
           <div className="cat-card__body">
             <h3 className="cat-card__title">Mobiles</h3>
-            <p className="cat-card__text">The latest smartphones from every major brand.</p>
+            <p className="cat-card__text">Every major brand.</p>
             <span className="cat-card__cta">
               Browse mobiles
               <ArrowRightIcon />
@@ -33,7 +33,7 @@ export default function Categories() {
           </div>
           <div className="cat-card__body">
             <h3 className="cat-card__title">Coming soon</h3>
-            <p className="cat-card__text">Wearables, audio and accessories are on the way.</p>
+            <p className="cat-card__text">On the way.</p>
             <span className="cat-card__cta">Stay tuned</span>
           </div>
           <span className="cat-card__pill">Upcoming</span>

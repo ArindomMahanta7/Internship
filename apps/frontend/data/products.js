@@ -12,8 +12,6 @@ export const PRODUCTS = [
     tagline: "Galaxy AI is here",
     price: 129999,
     oldPrice: 134999,
-    rating: 4.8,
-    reviews: 2140,
     color: "#2563eb",
     badge: "Flagship",
   },
@@ -24,8 +22,6 @@ export const PRODUCTS = [
     tagline: "Turbo performance",
     price: 17999,
     oldPrice: 19999,
-    rating: 4.5,
-    reviews: 8730,
     color: "#f59e0b",
     badge: "Best value",
   },
@@ -36,8 +32,6 @@ export const PRODUCTS = [
     tagline: "200MP pro-grade camera",
     price: 29999,
     oldPrice: 33999,
-    rating: 4.6,
-    reviews: 5410,
     color: "#a855f7",
     badge: "Hot",
   },
@@ -48,8 +42,6 @@ export const PRODUCTS = [
     tagline: "Built to last",
     price: 12499,
     oldPrice: 14999,
-    rating: 4.3,
-    reviews: 3120,
     color: "#14b8a6",
     badge: null,
   },
@@ -62,10 +54,4 @@ export function formatPrice(value) {
     currency: "INR",
     maximumFractionDigits: 0,
   }).format(value);
-}
-
-/* Compact review counts (e.g. 8730 -> "8.7k"). */
-export function formatCompact(value) {
-  if (value >= 1000) return `${(value / 1000).toFixed(1).replace(/\.0$/, "")}k`;
-  return String(value);
 }

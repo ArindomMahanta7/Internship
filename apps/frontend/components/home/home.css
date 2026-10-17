@@ -507,23 +507,6 @@
   color: var(--muted);
   font-size: 0.88rem;
 }
-.product-card__rating {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 2px;
-  color: #fbbf24;
-  font-size: 0.86rem;
-  font-weight: 600;
-}
-.product-card__rating svg {
-  width: 15px;
-  height: 15px;
-}
-.product-card__reviews {
-  color: var(--muted);
-  font-weight: 400;
-}
 .product-card__price {
   display: flex;
   align-items: baseline;

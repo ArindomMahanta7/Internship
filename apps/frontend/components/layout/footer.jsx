@@ -81,8 +81,8 @@ export default function Footer() {
       <div className="footer__bottom">
         <span>© {new Date().getFullYear()} BuyCart. All rights reserved.</span>
         <div className="footer__legal">
-          <Link href="/">Privacy</Link>
-          <Link href="/">Terms</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
         </div>
       </div>
     </footer>
