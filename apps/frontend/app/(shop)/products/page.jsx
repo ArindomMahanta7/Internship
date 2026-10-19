@@ -250,7 +250,7 @@ function ProductsInner() {
             <h1 className="products-sidebar__title">Products</h1>
             <p className="products-sidebar__desc">
               Explore our full catalogue of flagship &amp; mid-range smartphones
-              from the world's top brands.
+              from the world&apos;s top brands.
             </p>
 
             {/* Brand filter */}
