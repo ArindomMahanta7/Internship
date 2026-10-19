@@ -1,7 +1,7 @@
 /*
- * Navbar + footer styles (shared storefront chrome).
+ * Navbar + footer styles (shared storefront chrome) - light theme.
  * Colour tokens (--text, --muted, --border, ...) are defined on `.home-page`
- * in home.css and cascade down here.
+ * in home.css and cascade down here; fallbacks keep it correct standalone.
  */
 
 /* ---------- navbar ---------- */
@@ -10,10 +10,10 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(8, 12, 20, 0.72);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid var(--border, #e6e8ef);
 }
 
 .nav__inner {
@@ -30,7 +30,7 @@
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  color: var(--text, #e6edf6);
+  color: var(--text, #101322);
 }
 
 .nav__logo {
@@ -39,9 +39,9 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: #3b82f6;
+  background: #4f46e5;
   color: #fff;
-  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
 }
 .nav__logo svg {
   width: 20px;
@@ -62,19 +62,19 @@
 .nav__link {
   padding: 8px 14px;
   border-radius: 10px;
-  color: var(--muted, #9fb0c8);
+  color: var(--muted, #656d80);
   text-decoration: none;
   font-size: 0.94rem;
   font-weight: 500;
   transition: color 0.18s ease, background 0.18s ease;
 }
 .nav__link:hover {
-  color: var(--text, #e6edf6);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text, #101322);
+  background: rgba(16, 19, 34, 0.05);
 }
 .nav__link.is-active {
-  color: #fff;
-  background: rgba(59, 130, 246, 0.16);
+  color: #4f46e5;
+  background: rgba(79, 70, 229, 0.1);
 }
 
 .nav__search {
@@ -85,15 +85,15 @@
   padding: 9px 14px;
   min-width: 230px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  color: var(--muted, #9fb0c8);
+  background: #f1f3f9;
+  border: 1px solid var(--border, #e6e8ef);
+  color: var(--muted, #656d80);
   transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
 }
 .nav__search:focus-within {
-  border-color: rgba(59, 130, 246, 0.6);
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--text, #e6edf6);
+  border-color: rgba(79, 70, 229, 0.55);
+  background: #ffffff;
+  color: var(--text, #101322);
 }
 .nav__search svg {
   width: 18px;
@@ -128,11 +128,11 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  color: var(--text, #e6edf6);
+  color: var(--text, #101322);
   transition: background 0.18s ease;
 }
 .nav__cart:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(16, 19, 34, 0.05);
 }
 .nav__cart svg {
   width: 22px;
@@ -146,13 +146,13 @@
   height: 17px;
   padding: 0 4px;
   border-radius: 999px;
-  background: #3b82f6;
+  background: #4f46e5;
   color: #fff;
   font-size: 0.66rem;
   font-weight: 700;
   display: grid;
   place-items: center;
-  border: 2px solid rgba(8, 12, 20, 0.9);
+  border: 2px solid #ffffff;
 }
 
 .nav__auth {
@@ -161,15 +161,15 @@
   gap: 7px;
   padding: 9px 16px;
   border-radius: 10px;
-  background: #2563eb;
+  background: #4f46e5;
   color: #fff;
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 600;
-  transition: filter 0.18s ease, transform 0.18s ease;
+  transition: background 0.18s ease, transform 0.18s ease;
 }
 .nav__auth:hover {
-  filter: brightness(1.08);
+  background: #4338ca;
   transform: translateY(-1px);
 }
 .nav__auth svg {
@@ -183,9 +183,9 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  color: var(--text, #e6edf6);
+  background: #f1f3f9;
+  border: 1px solid var(--border, #e6e8ef);
+  color: var(--text, #101322);
   cursor: pointer;
 }
 .nav__toggle svg {
@@ -198,8 +198,8 @@
   flex-direction: column;
   gap: 14px;
   padding: 6px 20px 18px;
-  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  background: rgba(8, 12, 20, 0.92);
+  border-top: 1px solid var(--border, #e6e8ef);
+  background: #ffffff;
 }
 .nav__mobile-search {
   display: flex;
@@ -207,9 +207,9 @@
   gap: 10px;
   padding: 11px 14px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  color: var(--muted, #9fb0c8);
+  background: #f1f3f9;
+  border: 1px solid var(--border, #e6e8ef);
+  color: var(--muted, #656d80);
 }
 .nav__mobile-search svg {
   width: 18px;
@@ -233,14 +233,14 @@
 .nav__mobile-links a {
   padding: 11px 12px;
   border-radius: 10px;
-  color: var(--muted, #9fb0c8);
+  color: var(--muted, #656d80);
   text-decoration: none;
   font-weight: 500;
 }
 .nav__mobile-links a:hover,
 .nav__mobile-links a.is-active {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text, #101322);
+  background: rgba(16, 19, 34, 0.05);
 }
 
 @media (min-width: 901px) {
@@ -269,9 +269,12 @@
 
 .footer {
   margin-top: 72px;
-  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  background: #0a1220;
-  color: var(--muted, #9fb0c8);
+  border-top: 1px solid var(--border, #e6e8ef);
+  background: #f8f9fc;
+  /* Keep the paper sheet continuous through the footer. */
+  background-image: var(--paper-grain);
+  background-size: 180px 180px;
+  color: var(--muted, #656d80);
 }
 .footer__inner {
   max-width: 1200px;
@@ -296,7 +299,7 @@
   border-radius: 9px;
   display: grid;
   place-items: center;
-  background: #2563eb;
+  background: #4f46e5;
   color: #fff;
 }
 .footer__logo-mark svg {
@@ -306,7 +309,7 @@
 .footer__name {
   font-family: var(--font-brand), var(--font-geist-sans, system-ui), sans-serif;
   font-size: 1.3rem;
-  color: var(--text, #e6edf6);
+  color: var(--text, #101322);
 }
 .footer__tagline {
   margin: 0 0 18px;
@@ -323,15 +326,15 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  color: var(--muted, #9fb0c8);
+  background: #ffffff;
+  border: 1px solid var(--border, #e6e8ef);
+  color: var(--muted, #656d80);
   transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
 .footer__social-link:hover {
-  color: #fff;
-  border-color: rgba(59, 130, 246, 0.5);
-  background: rgba(59, 130, 246, 0.14);
+  color: #4f46e5;
+  border-color: rgba(79, 70, 229, 0.5);
+  background: rgba(79, 70, 229, 0.1);
 }
 .footer__social-link svg {
   width: 18px;
@@ -345,7 +348,7 @@
 }
 .footer__col-title {
   margin: 0 0 14px;
-  color: var(--text, #e6edf6);
+  color: var(--text, #101322);
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -358,20 +361,20 @@
   gap: 10px;
 }
 .footer__list a {
-  color: var(--muted, #9fb0c8);
+  color: var(--muted, #656d80);
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.15s ease;
 }
 .footer__list a:hover {
-  color: var(--text, #e6edf6);
+  color: #4f46e5;
 }
 
 .footer__bottom {
   max-width: 1200px;
   margin: 0 auto;
   padding: 18px 20px;
-  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-top: 1px solid var(--border, #e6e8ef);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -383,11 +386,11 @@
   gap: 18px;
 }
 .footer__legal a {
-  color: var(--muted, #9fb0c8);
+  color: var(--muted, #656d80);
   text-decoration: none;
 }
 .footer__legal a:hover {
-  color: var(--text, #e6edf6);
+  color: #4f46e5;
 }
 
 @media (max-width: 800px) {
@@ -403,5 +406,55 @@
   .footer__bottom {
     flex-direction: column;
     text-align: center;
+  }
+}
+
+/* ---------- Reload entrance: the page assembles itself ----------
+ * On a fresh load (and on client-side navigations) the chrome and the
+ * page's main sections rise into place in a short stagger, so a reload
+ * reads as "everything comes up" instead of a static pop.
+ * NOTE: the @keyframes live here (not in globals.css) because the
+ * Tailwind-processed globals bundle drops keyframes it doesn't see used
+ * within its own import graph - component CSS keeps them. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nav {
+    animation: nav-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Every storefront page puts its sections as direct <main> children:
+   * home (hero, brands, categories, carousel), products (sidebar, banner,
+   * grid), cart/orders/terms/privacy (content blocks). */
+  .home-page main > * {
+    animation: rise-in 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .home-page main > *:nth-child(1) { animation-delay: 0.05s; }
+  .home-page main > *:nth-child(2) { animation-delay: 0.13s; }
+  .home-page main > *:nth-child(3) { animation-delay: 0.21s; }
+  .home-page main > *:nth-child(4) { animation-delay: 0.29s; }
+  .home-page main > *:nth-child(n + 5) { animation-delay: 0.37s; }
+
+  .footer {
+    animation: rise-in 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
   }
 }

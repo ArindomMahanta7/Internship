@@ -58,13 +58,13 @@ function CartSvg({ className }) {
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M2 3a1 1 0 0 0 0 2h1.4a1 1 0 0 1 .95.68L6.2 9.6a2.4 2.4 0 0 0 2.26 1.6h8.9a1 1 0 0 1 .95.68l1.5 4.4a1.6 1.6 0 0 1-1.52 2.12H8.44a2.4 2.4 0 0 1-2.26-1.6L4.4 12H3.4"
-        stroke="#93c5fd"
+        stroke="#4f46e5"
         strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="9" cy="20" r="1.6" fill="#93c5fd" />
-      <circle cx="17.5" cy="20" r="1.6" fill="#93c5fd" />
+      <circle cx="9" cy="20" r="1.6" fill="#4f46e5" />
+      <circle cx="17.5" cy="20" r="1.6" fill="#4f46e5" />
     </svg>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { brandFont } from "../auth/brand-font";
 import { CartIcon, XIcon, InstagramIcon, FacebookIcon, YoutubeIcon } from "../icons";
+import CopyrightYear from "./CopyrightYear";
 import "./layout.css";
 
 const COLUMNS = [
@@ -79,7 +80,7 @@ export default function Footer() {
       </div>
 
       <div className="footer__bottom">
-        <span>© {new Date().getFullYear()} BuyCart. All rights reserved.</span>
+        <CopyrightYear />
         <div className="footer__legal">
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
