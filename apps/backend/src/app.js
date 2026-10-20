@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js"
 import cartRoutes from "./routes/cartRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -22,6 +23,7 @@ app.get("/health", (_req, res) => {
 app.use("/api/auth/", authRoutes);
 app.use("/api/product",productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.listen(port, () => {
   connectdb()

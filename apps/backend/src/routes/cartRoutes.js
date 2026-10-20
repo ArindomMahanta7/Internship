@@ -7,7 +7,7 @@ import {
     updateCartItem,
     removeFromCart,
     clearCart
-} from "../controllers/cartController.js";
+} from "../controllers/cartControllers.js";
 
 import authenticate from "../middleware/authenticate.js";
 
