@@ -1,10 +1,10 @@
-import { BRANDS } from "../../data/products";
+import { BRAND_NAMES } from "../brands/BrandLogo";
 import BrandLogo from "../brands/BrandLogo";
 
 /* Infinite logo marquee. The brand list is duplicated and the track slides by
  * -50%, so the loop is seamless. Pauses for reduced-motion users via CSS. */
 export default function BrandLoop() {
-  const loop = [...BRANDS, ...BRANDS];
+  const loop = [...BRAND_NAMES, ...BRAND_NAMES];
 
   return (
     <section className="brands" aria-label="Brands we carry">

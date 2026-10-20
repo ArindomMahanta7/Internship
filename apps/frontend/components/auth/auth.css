@@ -189,6 +189,30 @@
   text-align: center;
 }
 
+/* Muted helper copy inside the form (e.g. "we emailed a code to ..."). */
+.buycart-hint {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(226, 232, 240, 0.7);
+  text-align: center;
+}
+
+/* Green confirmation banner (login after a successful OTP verify). */
+.buycart-success {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  text-align: center;
+}
+
+
 /* ---------- buttons ---------- */
 
 .buycart-btn {

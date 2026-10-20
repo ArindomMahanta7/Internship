@@ -120,6 +120,57 @@ export const getCart = async (req, res) => {
 };
 
 
+// 2b. Replace the whole cart (used to sync the browser's localStorage cart
+// up to the account in one request - see apps/frontend/lib/cart.js).
+export const replaceCart = async (req, res) => {
+    try {
+        const { items } = req.body;
+
+        if (!Array.isArray(items)) {
+            return res.status(400).json({
+                message: "items must be an array"
+            });
+        }
+
+        const seen = new Set();
+        const cleaned = [];
+
+        for (const item of items) {
+            const productId = item?.product ?? item?.id ?? item?.productId;
+            const quantity = Number(item?.quantity ?? item?.qty ?? 1);
+
+            if (!productId || seen.has(productId)) continue;
+            if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) continue;
+
+            const exists = await Product.exists({ _id: productId });
+            if (!exists) continue;
+
+            seen.add(productId);
+            cleaned.push({ product: productId, quantity });
+        }
+
+        const cart = await Cart.findOneAndUpdate(
+            { user: req.user.userId },
+            { $set: { items: cleaned } },
+            { new: true, upsert: true, setDefaultsOnInsert: true }
+        ).populate("items.product");
+
+        const totalAmount = cart.items.reduce((total, item) => {
+            if (!item.product) return total;
+            return total + item.product.price * item.quantity;
+        }, 0);
+
+        return res.status(200).json({ message: "Cart synced", cart, totalAmount });
+    } catch (error) {
+        if (error.name === "CastError") {
+            return res.status(400).json({ message: "Invalid product id in cart" });
+        }
+        console.error("Replace cart error:", error);
+        return res.status(500).json({ message: "Failed to sync cart" });
+    }
+};
+
+
 // 3. Update the quantity of a product in the cart
 export const updateCartItem = async (req, res) => {
     try {

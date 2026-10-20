@@ -177,6 +177,42 @@
   height: 17px;
 }
 
+/* Signed-in cluster: name chip + a quieter logout button beside it. */
+.nav__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav__auth--admin {
+  background: #0f766e;
+}
+.nav__auth--admin:hover {
+  background: #115e59;
+}
+.nav__logout,
+.nav__mobile-logout {
+  border: 1px solid var(--border, #e6e8ef);
+  background: #f1f3f9;
+  color: var(--text, #101322);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.nav__logout:hover,
+.nav__mobile-logout:hover {
+  background: #fee2e2;
+  color: #b42318;
+  border-color: #fecaca;
+}
+.nav__mobile-user {
+  font-weight: 600;
+  opacity: 0.75;
+}
+
 .nav__toggle {
   display: none;
   place-items: center;

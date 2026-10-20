@@ -1,28 +1,32 @@
 import Link from "next/link";
+import AdminGate from "./AdminGate";
 import "./admin.css";
 
 /* Admin area layout: a sidebar on the left, page content on the right.
- * All /admin pages render inside this. */
+ * All /admin pages render inside this. AdminGate (client) keeps the UI in
+ * step with the session - the API is what actually enforces admin access. */
 export default function AdminLayout({ children }) {
   return (
-    <div className="admin">
-      <aside className="admin-sidebar">
-        <div className="admin-logo">BuyCart Admin</div>
+    <AdminGate>
+      <div className="admin">
+        <aside className="admin-sidebar">
+          <div className="admin-logo">BuyCart Admin</div>
 
-        <nav className="admin-nav">
-          <Link href="/admin">Dashboard</Link>
-          <Link href="/admin/orders">Orders</Link>
-          <Link href="/admin/products">Products</Link>
-          <Link href="/admin/analytics">Analytics</Link>
-          <Link href="/admin/users">Users</Link>
-        </nav>
+          <nav className="admin-nav">
+            <Link href="/admin">Dashboard</Link>
+            <Link href="/admin/orders">Orders</Link>
+            <Link href="/admin/products">Products</Link>
+            <Link href="/admin/analytics">Analytics</Link>
+            <Link href="/admin/users">Users</Link>
+          </nav>
 
-        <Link href="/" className="admin-back">
-          ← Back to store
-        </Link>
-      </aside>
+          <Link href="/" className="admin-back">
+            ← Back to store
+          </Link>
+        </aside>
 
-      <main className="admin-main">{children}</main>
-    </div>
+        <main className="admin-main">{children}</main>
+      </div>
+    </AdminGate>
   );
 }

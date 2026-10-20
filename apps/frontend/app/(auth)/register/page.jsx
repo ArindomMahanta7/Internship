@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import AuthForm from "../../../components/auth/AuthForm";
 import { PersonIcon, MailIcon, LockIcon, CheckIcon } from "../../../components/icons";
+import { register } from "../../../lib/api";
 
 const MIN_PASSWORD_LENGTH = 8;
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [agreed, setAgreed] = useState(false);
 
   function validate(values) {
@@ -30,10 +33,17 @@ export default function RegisterPage() {
     return null;
   }
 
+  /* POST /api/auth/register - the API mails a 6-digit OTP and returns 201.
+   * The account is unverified until /verify is completed, so that is where
+   * we send them (the email is passed along so the form is pre-filled). */
   async function handleSubmit(values) {
-    // TODO: create the account via the auth API once the backend is ready,
-    // then redirect to /verify (or straight to / on success).
-    void values;
+    await register({
+      name: values.fullName.trim(),
+      email: values.email.trim(),
+      password: values.password,
+    });
+
+    router.push(`/verify?email=${encodeURIComponent(values.email.trim())}`);
   }
 
   return (

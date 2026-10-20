@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { brandFont } from "../auth/brand-font";
 import { CartIcon, BagIcon, SearchIcon, MenuIcon, CloseIcon, PersonIcon } from "../icons";
+import { useCart } from "../../lib/cart";
+import { useUser, signOut } from "../../lib/auth";
 import "./layout.css";
 
 const LINKS = [
@@ -15,10 +17,16 @@ const LINKS = [
 
 /* Sticky glass navbar: brand, primary links, search, cart and auth. The search
  * box submits to /products?q=..., and on small screens the links collapse into
- * a toggleable panel. */
+ * a toggleable panel.
+ *
+ * The right-hand slot reflects the session from /api/auth/me: a "Log in" link
+ * when signed out, the visitor's first name + a logout button when signed in
+ * (plus an Admin link for admin accounts). */
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const { count } = useCart();
+  const { user, isLoggedIn } = useUser();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -28,6 +36,18 @@ export default function Navbar() {
     setOpen(false);
     router.push(term ? `/products?q=${encodeURIComponent(term)}` : "/products");
   };
+
+  const handleLogout = async () => {
+    setOpen(false);
+    await signOut();
+    // Drop any cached RSC payload so the next page renders the signed-out UI.
+    router.replace("/");
+    router.refresh();
+  };
+
+  const firstName = user?.name?.split(" ")[0] ?? "Account";
+  const isAdmin = user?.role === "admin";
+
 
   return (
     <header className={`nav ${brandFont.variable}`}>
@@ -63,15 +83,42 @@ export default function Navbar() {
         </form>
 
         <div className="nav__actions">
-          <Link href="/cart" className="nav__cart" aria-label="Cart, 0 items">
+          <Link
+            href="/cart"
+            className="nav__cart"
+            aria-label={count === 0 ? "Cart, empty" : `Cart, ${count} item${count === 1 ? "" : "s"}`}
+          >
             <BagIcon />
-            <span className="nav__badge">0</span>
+            {count > 0 ? <span className="nav__badge">{count}</span> : null}
           </Link>
 
-          <Link href="/login" className="nav__auth">
-            <PersonIcon />
-            <span>Log in</span>
-          </Link>
+          {isAdmin ? (
+            <Link href="/admin" className="nav__auth nav__auth--admin">
+              <span>Admin</span>
+            </Link>
+          ) : null}
+
+          {isLoggedIn ? (
+            <div className="nav__user">
+              <Link href="/orders" className="nav__auth" title="Your orders">
+                <PersonIcon />
+                <span>{firstName}</span>
+              </Link>
+              <button
+                type="button"
+                className="nav__logout"
+                onClick={handleLogout}
+                aria-label="Log out"
+              >
+                Log out
+              </button>
+            </div>
+          ) : (
+            <Link href="/login" className="nav__auth">
+              <PersonIcon />
+              <span>Log in</span>
+            </Link>
+          )}
 
           <button
             type="button"
@@ -111,9 +158,25 @@ export default function Navbar() {
             <Link href="/cart" onClick={() => setOpen(false)}>
               Cart
             </Link>
-            <Link href="/login" onClick={() => setOpen(false)}>
-              Log in / Sign up
-            </Link>
+            {isAdmin ? (
+              <Link href="/admin" onClick={() => setOpen(false)}>
+                Admin
+              </Link>
+            ) : null}
+            {isLoggedIn ? (
+              <>
+                <span className="nav__mobile-user" title={user?.email}>
+                  Hi, {firstName}
+                </span>
+                <button type="button" className="nav__mobile-logout" onClick={handleLogout}>
+                  Log out
+                </button>
+              </>
+            ) : (
+              <Link href="/login" onClick={() => setOpen(false)}>
+                Log in / Sign up
+              </Link>
+            )}
           </nav>
         </div>
       ) : null}

@@ -2,35 +2,63 @@
 import Product from "../models/productModel.js";
 import { uploadFile } from "../config/cloudinary.js";
 
+/* Fields an admin may send alongside the images. `images` is handled
+ * separately (it arrives as uploaded files, not JSON). */
+function pickProductFields(body) {
+    const out = {};
+    if (typeof body.brandName === "string") out.brandName = body.brandName.trim();
+    if (typeof body.modelName === "string") out.modelName = body.modelName.trim();
+    if (typeof body.description === "string") out.description = body.description.trim();
+    if (typeof body.tagline === "string") out.tagline = body.tagline.trim();
+    if (typeof body.badge === "string") out.badge = body.badge.trim() || null;
+    if (typeof body.color === "string") out.color = body.color.trim();
+
+    if (body.price !== undefined && body.price !== "") out.price = Number(body.price);
+    if (body.oldPrice !== undefined && body.oldPrice !== "") out.oldPrice = Number(body.oldPrice);
+    if (body.stock !== undefined && body.stock !== "") out.stock = Number(body.stock);
+    else if (body.stock === "") out.stock = 0;
+
+    return out;
+}
+
+function validatePrices({ price, oldPrice }) {
+    if (!Number.isFinite(price) || price < 0) {
+        return "Price must be a valid non-negative number";
+    }
+    if (oldPrice !== undefined && oldPrice !== null) {
+        if (!Number.isFinite(oldPrice) || oldPrice < 0) {
+            return "MRP must be a valid non-negative number";
+        }
+    }
+    return null;
+}
+
 export const createProduct = async (req, res) => {
     try {
-        const { brandName, modelName, description, price } = req.body;
+        const fields = pickProductFields(req.body);
 
         // Validate product details
         if (
-            typeof brandName !== "string" || !brandName.trim() ||
-            typeof modelName !== "string" || !modelName.trim() ||
-            typeof description !== "string" || !description.trim() ||
-            price === undefined || price === ""
+            typeof fields.brandName !== "string" || !fields.brandName ||
+            typeof fields.modelName !== "string" || !fields.modelName ||
+            typeof fields.description !== "string" || !fields.description ||
+            fields.price === undefined
         ) {
             return res.status(400).json({
                 message: "All product fields are required"
             });
         }
 
-        const productPrice = Number(price);
-
-        if (!Number.isFinite(productPrice) || productPrice < 0) {
-            return res.status(400).json({
-                message: "Price must be a valid non-negative number"
-            });
+        const priceError = validatePrices(fields);
+        if (priceError) {
+            return res.status(400).json({ message: priceError });
         }
 
         // Images are optional
         const files = req.files || [];
         const imageUrls = [];
 
-        // Upload images to Cloudinary
+        // Upload images to Cloudinary (or local disk when not configured)
         for (const file of files) {
             const result = await uploadFile(file);
             imageUrls.push(result.secure_url);
@@ -38,10 +66,7 @@ export const createProduct = async (req, res) => {
 
         // Save product and image URLs in MongoDB
         const product = await Product.create({
-            brandName: brandName.trim(),
-            modelName: modelName.trim(),
-            description: description.trim(),
-            price: productPrice,
+            ...fields,
             images: imageUrls
         });
 
@@ -60,14 +85,70 @@ export const createProduct = async (req, res) => {
 };
 
 
+// Update a product (admin) - optional replacement images.
+export const updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const product = await Product.findById(id);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        const fields = pickProductFields(req.body);
+        const priceError = validatePrices({
+            price: fields.price ?? product.price,
+            oldPrice: fields.oldPrice !== undefined ? fields.oldPrice : product.oldPrice
+        });
+        if (priceError) {
+            return res.status(400).json({ message: priceError });
+        }
+
+        const files = req.files || [];
+        const imageUrls = [];
+        for (const file of files) {
+            const result = await uploadFile(file);
+            imageUrls.push(result.secure_url);
+        }
+
+        Object.assign(product, fields);
+        // Only swap the image list when new files were uploaded.
+        if (imageUrls.length > 0) product.images = imageUrls;
+
+        await product.save();
+
+        return res.status(200).json({
+            message: "Product updated successfully",
+            product
+        });
+    } catch (error) {
+        console.error("Update product error:", error);
+        return res.status(500).json({ message: "Failed to update product" });
+    }
+};
 
 
+// Delete a product (admin).
+export const deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findByIdAndDelete(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        return res.status(200).json({ message: "Product deleted" });
+    } catch (error) {
+        console.error("Delete product error:", error);
+        return res.status(500).json({ message: "Failed to delete product" });
+    }
+};
 
 
 // Get all products
 export const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find().sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "Products fetched successfully",
@@ -102,6 +183,11 @@ export const getProductById = async (req, res) => {
         });
     } catch (error) {
         console.error("Get product by ID error:", error);
+
+        // A malformed ObjectId is a client error, not a server failure.
+        if (error.name === "CastError") {
+            return res.status(404).json({ message: "Product not found" });
+        }
 
         return res.status(500).json({
             message: "Failed to fetch product"

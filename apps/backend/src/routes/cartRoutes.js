@@ -4,6 +4,7 @@ import express from "express";
 import {
     addToCart,
     getCart,
+    replaceCart,
     updateCartItem,
     removeFromCart,
     clearCart
@@ -15,6 +16,9 @@ const router = express.Router();
 
 // Get the logged-in user's cart
 router.get("/", authenticate, getCart);
+
+// Replace the whole cart (bulk sync from the browser)
+router.put("/", authenticate, replaceCart);
 
 // Add a product to the cart
 router.post("/", authenticate, addToCart);

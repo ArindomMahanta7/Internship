@@ -8,9 +8,11 @@ import gsap from "gsap";
 
 import Navbar from "../../../components/layout/navbar";
 import Footer from "../../../components/layout/footer";
-import PhoneArt from "../../../components/home/PhoneArt";
+import ProductMedia from "../../../components/products/ProductMedia";
 import { brandFont } from "../../../components/auth/brand-font";
-import { PRODUCTS, BRANDS, formatPrice } from "../../../data/products";
+import { formatPrice } from "../../../data/products";
+import { fetchProducts } from "../../../lib/api";
+import { useCart } from "../../../lib/cart";
 import "../../../components/home/home.css";
 import "../../../components/products/products.css";
 
@@ -28,6 +30,9 @@ const BRAND_COLORS = {
   realme: "#f59e0b",
   Redmi: "#a855f7",
   Micromax: "#ef4444",
+  OnePlus: "#0f172a",
+  Apple: "#64748b",
+  Google: "#ec4899",
 };
 
 function savings(product) {
@@ -73,6 +78,7 @@ const ProductCard = forwardRef(function ProductCard({ product, index, allCardsRe
     else if (ref) ref.current = el;
   }, [ref]);
   const [added, setAdded] = useState(false);
+  const { addToCart } = useCart();
 
   /* Hover expand: card grows to flex-grow 1.5, siblings shrink to 0.6 */
   const onMouseEnter = useCallback(() => {
@@ -119,6 +125,7 @@ const ProductCard = forwardRef(function ProductCard({ product, index, allCardsRe
     e.preventDefault();
     e.stopPropagation();
     if (added) return;
+    addToCart(product);
     setAdded(true);
     /* Bounce feedback */
     gsap.fromTo(
@@ -152,7 +159,11 @@ const ProductCard = forwardRef(function ProductCard({ product, index, allCardsRe
         {product.badge && (
           <span className="pcard__badge">{product.badge}</span>
         )}
-        <PhoneArt color={product.color} className="pcard__phone" />
+        <ProductMedia
+          product={product}
+          className="pcard__phone"
+          sizes="(max-width: 760px) 90vw, 300px"
+        />
       </div>
 
       <div className="pcard__info">
@@ -190,11 +201,40 @@ function ProductsInner() {
   const [sort, setSort] = useState("default");
   const [query] = useState(initialQuery);
 
+  /* Live catalog from the API. Kept in state rather than fetched during
+   * render: this subtree is a client component, and the sidebar/grids below
+   * need the full list to filter + sort. */
+  const [products, setProducts] = useState([]);
+  const [status, setStatus] = useState("loading"); // loading | ready | error
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    fetchProducts()
+      .then((list) => {
+        if (!alive) return;
+        setProducts(list);
+        setStatus("ready");
+      })
+      .catch((err) => {
+        if (!alive) return;
+        setLoadError(err.message);
+        setStatus("error");
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  /* Brand chips come from whatever the API actually returned, so new
+   * brands don't need a hardcoded list. */
+  const brands = [...new Set(products.map((p) => p.brand).filter(Boolean))].sort();
+
   /* Shared ref array for all card DOM nodes (for GSAP sibling effects) */
   const allCardsRef = useRef([]);
 
   /* Derived product list */
-  const filtered = PRODUCTS.filter((p) => {
+  const filtered = products.filter((p) => {
     const matchBrand = activeBrand === "All" || p.brand === activeBrand;
     const matchQuery =
       !query ||
@@ -256,7 +296,7 @@ function ProductsInner() {
             {/* Brand filter */}
             <div className="products-filters__group">
               <p className="products-filters__heading">Brand</p>
-              {["All", ...BRANDS].map((brand) => (
+              {["All", ...brands].map((brand) => (
                 <button
                   key={brand}
                   type="button"
@@ -322,14 +362,57 @@ function ProductsInner() {
             {/* Grid header */}
             <div className="products-grid-header">
               <p className="products-grid-header__label">
-                Showing <strong>{displayed.length}</strong> product
-                {displayed.length !== 1 ? "s" : ""}
-                {activeBrand !== "All" ? ` · ${activeBrand}` : ""}
+                {status === "ready" ? (
+                  <>
+                    Showing <strong>{displayed.length}</strong> product
+                    {displayed.length !== 1 ? "s" : ""}
+                    {activeBrand !== "All" ? ` · ${activeBrand}` : ""}
+                  </>
+                ) : (
+                  "Loading catalog…"
+                )}
               </p>
             </div>
 
             {/* Product grid */}
-            {displayed.length > 0 ? (
+            {status === "error" ? (
+              <div className="products-empty" role="alert">
+                <p>Couldn&apos;t load the catalog: {loadError}</p>
+                <button
+                  type="button"
+                  className="filter-chip"
+                  onClick={() => {
+                    setStatus("loading");
+                    fetchProducts()
+                      .then((list) => {
+                        setProducts(list);
+                        setStatus("ready");
+                      })
+                      .catch((err) => {
+                        setLoadError(err.message);
+                        setStatus("error");
+                      });
+                  }}
+                >
+                  Try again
+                </button>
+              </div>
+            ) : status === "loading" ? (
+              <div className="products-grid" aria-busy="true" aria-label="Loading products">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div className="pcard pcard--entry" key={i} aria-hidden="true">
+                    <div className="pcard__art">
+                      <div className="pcard__skeleton pcard__skeleton--art" />
+                    </div>
+                    <div className="pcard__info">
+                      <div className="pcard__skeleton pcard__skeleton--line" style={{ width: "35%" }} />
+                      <div className="pcard__skeleton pcard__skeleton--line" style={{ width: "70%" }} />
+                      <div className="pcard__skeleton pcard__skeleton--line" style={{ width: "45%" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : displayed.length > 0 ? (
               <div className="products-grid" role="list" aria-label="Products">
                 {displayed.map((product, i) => (
                   <ProductCard

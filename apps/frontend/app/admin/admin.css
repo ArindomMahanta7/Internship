@@ -5,6 +5,18 @@
  */
 
 /* ── page shell ───────────────────────────────────────────────────── */
+
+/* Placeholder shown by AdminGate while /api/auth/me resolves. */
+.admin-gate {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: #f4f6fa;
+  color: #656d80;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
 .admin {
   min-height: 100dvh;
   display: grid;
@@ -276,6 +288,95 @@
   color: #047857;
   font-size: 0.88rem;
   font-weight: 600;
+}
+.admin-message--error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b42318;
+}
+.admin-message--ok {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #047857;
+}
+
+/* Two inputs side by side (price/MRP, stock/badge). */
+.admin-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* Colour picker: native swatch + hex text box. */
+.admin-color {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 7px;
+}
+.admin-color .admin-input {
+  margin-top: 0;
+  flex: 1;
+}
+.admin-color__swatch {
+  width: 42px;
+  height: 42px;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid #e3e7f0;
+  background: #f7f8fc;
+  cursor: pointer;
+  flex: none;
+}
+
+/* Small muted helper copy under a label. */
+.admin-note {
+  display: block;
+  margin-top: 7px;
+  color: #656d80;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Existing product photos on the edit form. */
+.admin-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+.admin-thumb {
+  width: 64px;
+  height: 88px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e3e7f0;
+  background: #f7f8fc;
+}
+
+/* Edit + Delete share a cell in the products table. */
+.admin-table__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+.admin-table__actions .admin-link {
+  margin-top: 0;
+}
+.admin-link--danger {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #b42318;
+  cursor: pointer;
+}
+.admin-link--danger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 /* ── bar chart ────────────────────────────────────────────────────── */

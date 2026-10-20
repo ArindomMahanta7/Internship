@@ -2,6 +2,8 @@ import express from "express";
 
 import {
     createProduct,
+    updateProduct,
+    deleteProduct,
     getAllProducts,
     getProductById,
     getProductsByBrand
@@ -31,17 +33,35 @@ router.get(
 );
 
 
+// Get products by brand.
+// Registered before "/:id" so the literal path isn't swallowed as an id.
+router.get(
+    "/brand/:brandName",
+    getProductsByBrand
+);
+
+
+// Update / delete a product - Admin only
+router.put(
+    "/:id",
+    authenticate,
+    adminOnly,
+    upload.array("images", 5),
+    updateProduct
+);
+
+router.delete(
+    "/:id",
+    authenticate,
+    adminOnly,
+    deleteProduct
+);
+
+
 // Get product by ID
 router.get(
     "/:id",
     getProductById
-);
-
-
-// Get products by brand
-router.get(
-    "/brand/:brandName",
-    getProductsByBrand
 );
 
 

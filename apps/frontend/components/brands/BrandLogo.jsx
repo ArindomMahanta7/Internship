@@ -6,7 +6,7 @@
  * dropping an <img> in place - the sizing is handled in layout.css.
  */
 
-export const BRAND_NAMES = ["Nokia", "Samsung", "realme", "Redmi", "Micromax"];
+export const BRAND_NAMES = ["Nokia", "Samsung", "realme", "Redmi", "Micromax", "OnePlus", "Apple", "Google"];
 
 const FONT = "Arial, Helvetica, sans-serif";
 
@@ -57,6 +57,33 @@ export default function BrandLogo({ brand, className = "" }) {
         <svg viewBox="0 0 215 56" {...common}>
           <text x="107" y="38" textAnchor="middle" fontFamily={FONT} fontWeight="700" fontSize="30" letterSpacing="0.5">
             micromax
+          </text>
+        </svg>
+      );
+    case "OnePlus":
+      return (
+        <svg viewBox="0 0 200 56" {...common}>
+          <text x="60" y="39" textAnchor="middle" fontFamily={FONT} fontWeight="800" fontSize="33">
+            1+
+          </text>
+          <text x="132" y="37" textAnchor="middle" fontFamily={FONT} fontWeight="700" fontSize="25" letterSpacing="1">
+            OnePlus
+          </text>
+        </svg>
+      );
+    case "Apple":
+      return (
+        <svg viewBox="0 0 175 56" {...common}>
+          <text x="87" y="39" textAnchor="middle" fontFamily={FONT} fontWeight="700" fontSize="31" letterSpacing="1">
+            Apple
+          </text>
+        </svg>
+      );
+    case "Google":
+      return (
+        <svg viewBox="0 0 185 56" {...common}>
+          <text x="92" y="39" textAnchor="middle" fontFamily={FONT} fontWeight="700" fontSize="31" letterSpacing="1">
+            Google
           </text>
         </svg>
       );

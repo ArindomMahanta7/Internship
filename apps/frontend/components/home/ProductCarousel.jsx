@@ -1,32 +1,45 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import PhoneArt from "./PhoneArt";
-import { PRODUCTS, formatPrice } from "../../data/products";
+import ProductMedia from "../products/ProductMedia";
+import { formatPrice } from "../../data/products";
+import { fetchProducts } from "../../lib/api";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "../icons";
+import { useCart } from "../../lib/cart";
 
 /* Featured products in a horizontal, scroll-snapped carousel.
  * Client component: the arrow buttons scroll the track, and "Add to cart"
- * gives local "Added" feedback (real cart state comes later). */
+ * writes to the shared cart (lib/cart.js). The product list itself comes
+ * from the API rather than the static catalog. The button reads "Added" while
+ * the product is in the cart; clicking it again removes the product. */
 export default function ProductCarousel() {
   const trackRef = useRef(null);
-  const [added, setAdded] = useState(() => new Set());
+  const { items, addToCart, removeFromCart } = useCart();
+  const [products, setProducts] = useState([]);
+  const [status, setStatus] = useState("loading");
+
+  useEffect(() => {
+    let alive = true;
+    fetchProducts()
+      .then((list) => {
+        if (!alive) return;
+        setProducts(list);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (alive) setStatus("error");
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const scrollBy = (dir) => {
     const el = trackRef.current;
     if (!el) return;
     const amount = Math.round(el.clientWidth * 0.85);
     el.scrollBy({ left: dir * amount, behavior: "smooth" });
-  };
-
-  const toggleAdded = (id) => {
-    setAdded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
   };
 
   return (
@@ -61,14 +74,41 @@ export default function ProductCarousel() {
         </div>
       </div>
 
-      <div className="products__track" ref={trackRef}>
-        {PRODUCTS.map((p) => {
-          const isAdded = added.has(p.id);
+      <div className="products__track" ref={trackRef} aria-busy={status === "loading"}>
+        {status === "loading"
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <article className="product-card" key={i} aria-hidden="true">
+                <div className="product-card__art">
+                  <div className="pcard__skeleton pcard__skeleton--art" />
+                </div>
+                <div className="product-card__info">
+                  <div className="pcard__skeleton pcard__skeleton--line" style={{ width: "35%" }} />
+                  <div className="pcard__skeleton pcard__skeleton--line" style={{ width: "75%" }} />
+                  <div className="pcard__skeleton pcard__skeleton--line" style={{ width: "50%" }} />
+                </div>
+              </article>
+            ))
+          : status === "error"
+            ? (
+              <p className="section__sub" role="alert">
+                Couldn&apos;t reach the store — refresh to try again.
+              </p>
+            )
+            : products.length === 0
+              ? (
+                <p className="section__sub">No products yet — check back soon.</p>
+              )
+              : products.map((p) => {
+          const isAdded = items.some((item) => item.id === p.id);
           return (
             <article className="product-card" key={p.id}>
               <div className="product-card__art">
                 {p.badge ? <span className="product-card__badge">{p.badge}</span> : null}
-                <PhoneArt color={p.color} className="product-card__phone" />
+                <ProductMedia
+                  product={p}
+                  className="product-card__phone"
+                  sizes="(max-width: 760px) 70vw, 240px"
+                />
               </div>
 
               <div className="product-card__info">
@@ -86,7 +126,7 @@ export default function ProductCarousel() {
                 <button
                   type="button"
                   className={`product-card__add${isAdded ? " is-added" : ""}`}
-                  onClick={() => toggleAdded(p.id)}
+                  onClick={() => (isAdded ? removeFromCart(p.id) : addToCart(p))}
                 >
                   {isAdded ? (
                     <>

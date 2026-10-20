@@ -1,51 +1,8 @@
-/* Static catalog for the BuyCart home page (and a source the /products page can
- * grow into). Each product's `color` drives the generated phone art, so the
- * cards look like devices without needing image assets. */
-
-export const BRANDS = ["Nokia", "Samsung", "realme", "Redmi", "Micromax"];
-
-export const PRODUCTS = [
-  {
-    id: "galaxy-s24-ultra",
-    brand: "Samsung",
-    name: "Galaxy S24 Ultra",
-    tagline: "Galaxy AI is here",
-    price: 129999,
-    oldPrice: 134999,
-    color: "#2563eb",
-    badge: "Flagship",
-  },
-  {
-    id: "realme-narzo-70-turbo",
-    brand: "realme",
-    name: "Narzo 70 Turbo 5G",
-    tagline: "Turbo performance",
-    price: 17999,
-    oldPrice: 19999,
-    color: "#f59e0b",
-    badge: "Best value",
-  },
-  {
-    id: "redmi-note-13-pro-plus",
-    brand: "Redmi",
-    name: "Note 13 Pro+ 5G",
-    tagline: "200MP pro-grade camera",
-    price: 29999,
-    oldPrice: 33999,
-    color: "#a855f7",
-    badge: "Hot",
-  },
-  {
-    id: "nokia-g42-5g",
-    brand: "Nokia",
-    name: "G42 5G",
-    tagline: "Built to last",
-    price: 12499,
-    oldPrice: 14999,
-    color: "#14b8a6",
-    badge: null,
-  },
-];
+/* Formatting helpers shared across the storefront.
+ *
+ * The product catalog itself now lives in the API (MongoDB) and is fetched
+ * through lib/api.js - see apps/backend/src/seed.js to add records. Only the
+ * price formatter still lives here. */
 
 /* ₹ with Indian grouping, no decimals (e.g. 129999 -> "₹1,29,999"). */
 export function formatPrice(value) {
@@ -53,5 +10,5 @@ export function formatPrice(value) {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
-  }).format(value);
+  }).format(value ?? 0);
 }

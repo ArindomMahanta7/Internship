@@ -5,6 +5,128 @@
  * Tokens (--text, --muted, --border, --glass, --accent-*) come from home.css.
  */
 
+/* ── orders page ─────────────────────────────────────────────────── */
+.orders-list {
+  display: grid;
+  gap: 18px;
+  padding-bottom: 40px;
+}
+.order-card {
+  background: #fff;
+  border: 1px solid var(--border, #e6e8ef);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: 0 6px 18px rgba(16, 19, 34, 0.04);
+}
+.order-card--loading {
+  display: grid;
+  gap: 12px;
+}
+.order-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border, #e6e8ef);
+}
+.order-card__ref {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.order-card__date {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted, #656d80);
+}
+.order-card__status {
+  flex: none;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  background: #f1f3f9;
+  color: var(--muted, #656d80);
+}
+.order-card__status--confirmed,
+.order-card__status--shipped {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.order-card__status--delivered {
+  background: #ecfdf5;
+  color: #047857;
+}
+.order-card__status--cancelled {
+  background: #fef2f2;
+  color: #b42318;
+}
+
+.order-card__items {
+  list-style: none;
+  margin: 0;
+  padding: 14px 0 0;
+  display: grid;
+  gap: 14px;
+}
+.order-card__item {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+}
+.order-card__art {
+  width: 46px;
+  height: 66px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f4f6fa;
+}
+.order-card__info {
+  min-width: 0;
+}
+.order-card__brand {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted, #656d80);
+}
+.order-card__name {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.order-card__meta {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted, #656d80);
+}
+.order-card__total {
+  font-size: 0.95rem;
+}
+.order-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border, #e6e8ef);
+  font-size: 0.9rem;
+  color: var(--muted, #656d80);
+}
+.order-card__foot strong {
+  color: var(--text, #101322);
+  font-size: 1.05rem;
+}
+
 /* ── page shell ─────────────────────────────────────────────────── */
 .products-page {
   min-height: 100dvh;
@@ -271,6 +393,34 @@
   opacity: 1;
 }
 
+/* loading skeleton for the product grid (mirrors .pcard's box) */
+.pcard__skeleton {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(16, 19, 34, 0.06) 25%,
+    rgba(16, 19, 34, 0.11) 37%,
+    rgba(16, 19, 34, 0.06) 63%
+  );
+  background-size: 400% 100%;
+  animation: pcard-shimmer 1.4s ease infinite;
+}
+.pcard__skeleton--art {
+  width: 128px;
+  height: 220px;
+  border-radius: 18px;
+}
+.pcard__skeleton--line {
+  width: 60%;
+  height: 12px;
+  margin: 4px 0;
+}
+@keyframes pcard-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
 /* info */
 .pcard__info {
   display: flex;
@@ -395,5 +545,244 @@
   }
   .pcard {
     flex: 1 1 100%;
+  }
+}
+
+/* ==========================================================================
+ * Product detail page (/products/[id]) - big art + info + related row
+ * ========================================================================== */
+.pdp__crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 0.84rem;
+  color: var(--muted, #656d80);
+}
+.pdp__crumbs a {
+  color: var(--muted, #656d80);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.pdp__crumbs a:hover {
+  color: #4f46e5;
+}
+.pdp__crumbs [aria-current="page"] {
+  color: var(--text, #101322);
+  font-weight: 600;
+}
+
+.pdp {
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+}
+
+/* left: the phone art card */
+.pdp__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 56px 24px;
+  background: #ffffff;
+  border: 1px solid var(--border, #e6e8ef);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(16, 19, 34, 0.05);
+}
+.pdp__phone {
+  --pw: 180px;
+}
+.pdp__badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* right: info + buy row */
+.pdp__skeleton {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(16, 19, 34, 0.06) 25%,
+    rgba(16, 19, 34, 0.11) 37%,
+    rgba(16, 19, 34, 0.06) 63%
+  );
+  background-size: 400% 100%;
+  animation: pdp-shimmer 1.4s ease infinite;
+}
+@keyframes pdp-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+.pdp--loading {
+  min-height: 420px;
+}
+.pdp__desc {
+  margin: 18px 0 0;
+  color: var(--muted, #656d80);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 56ch;
+}
+.pdp__stock.is-out {
+  color: #b42318;
+}
+.pdp__stock.is-out .pdp__stock-dot {
+  background: #b42318;
+}
+.pdp__brand {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted, #656d80);
+}
+.pdp__name {
+  margin: 6px 0 4px;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--text, #101322);
+}
+.pdp__tag {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--muted, #656d80);
+}
+
+.pdp__price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 22px 0 0;
+}
+.pdp__now {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--text, #101322);
+}
+.pdp__old {
+  font-size: 1.05rem;
+  color: var(--muted, #656d80);
+  text-decoration: line-through;
+}
+.pdp__save {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pdp__stock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 22px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #059669;
+}
+.pdp__stock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  flex-shrink: 0;
+}
+
+.pdp__buy {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.pdp__add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 12px;
+  background: #4f46e5;
+  color: #fff;
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.pdp__add:hover {
+  background: #4338ca;
+}
+.pdp__add:active {
+  transform: translateY(1px);
+}
+.pdp__add.is-added {
+  background: #16a34a;
+}
+.pdp__add svg {
+  width: 17px;
+  height: 17px;
+}
+.pdp__buy-now {
+  padding: 12px 22px;
+  border: 1px solid var(--border, #e6e8ef);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text, #101322);
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.pdp__buy-now:hover {
+  border-color: #4f46e5;
+  color: #4f46e5;
+}
+
+/* related row - a plain grid of the home carousel's product cards */
+.pdp__related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+}
+.pdp__related-grid .product-card {
+  text-decoration: none;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .pdp {
+    grid-template-columns: 1fr;
+  }
+  .pdp__art {
+    padding: 44px 24px;
+  }
+}
+@media (max-width: 480px) {
+  .pdp__phone {
+    --pw: 150px;
+  }
+  .pdp__now {
+    font-size: 1.6rem;
   }
 }
