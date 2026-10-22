@@ -202,6 +202,11 @@
   background: #fffbeb;
   border: 1px solid #fde68a;
 }
+.admin-badge.red {
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
 
 /* ── button ───────────────────────────────────────────────────────── */
 .admin-btn {

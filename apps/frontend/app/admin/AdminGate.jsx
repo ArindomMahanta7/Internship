@@ -24,17 +24,18 @@ export default function AdminGate({ children }) {
     }
   }, [status, user, router]);
 
-  if (status !== "ready") {
+  const allowed = status === "ready" && user?.role === "admin";
+
+  if (!allowed) {
     return (
       <div className="admin-gate" role="status" aria-live="polite">
-        Checking your access…
+        <span>{status === "ready" ? null : "Checking your access…"}</span>
+        {/* Mount the admin UI hidden rather than dropping it: Next's
+         * instant-navigation validation (dev-only) flags routes whose page
+         * segment never renders, and the API enforces access anyway. */}
+        <div hidden>{children}</div>
       </div>
     );
-  }
-
-  // Signed in but not an admin: the redirect above is already in flight.
-  if (!user || user.role !== "admin") {
-    return <div className="admin-gate" role="status" aria-live="polite" />;
   }
 
   return children;

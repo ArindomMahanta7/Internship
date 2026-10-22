@@ -1,35 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { fetchProducts, deleteProduct } from "../../../lib/api";
 import { formatPrice } from "../../../data/products";
+import useAdminData from "../useAdminData";
 
 /* Admin product list, straight from the API. Deleting is optimistic-ish: the
  * row is removed once the DELETE succeeds, with an inline error if it fails. */
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState([]);
-  const [status, setStatus] = useState("loading"); // loading | ready | error
-  const [loadError, setLoadError] = useState("");
+  const { data: products, status, error, reload } = useAdminData(fetchProducts);
   const [deletingId, setDeletingId] = useState(null);
   const [rowError, setRowError] = useState("");
-
-  const load = useCallback(() => {
-    setStatus("loading");
-    fetchProducts()
-      .then((list) => {
-        setProducts(list);
-        setStatus("ready");
-      })
-      .catch((err) => {
-        setLoadError(err.message);
-        setStatus("error");
-      });
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  // Rows deleted this session, hidden immediately after the DELETE succeeds.
+  const [deletedIds, setDeletedIds] = useState([]);
 
   async function handleDelete(product) {
     const confirmed = window.confirm(`Delete ${product.brand} ${product.name}?`);
@@ -40,13 +24,15 @@ export default function AdminProductsPage() {
 
     try {
       await deleteProduct(product.id);
-      setProducts((current) => current.filter((p) => p.id !== product.id));
+      setDeletedIds((current) => [...current, product.id]);
     } catch (err) {
       setRowError(`Couldn't delete ${product.name}: ${err.message}`);
     } finally {
       setDeletingId(null);
     }
   }
+
+  const visible = (products ?? []).filter((p) => !deletedIds.includes(p.id));
 
   return (
     <div>
@@ -65,14 +51,14 @@ export default function AdminProductsPage() {
 
       {status === "error" ? (
         <p className="admin-message admin-message--error" role="alert">
-          Couldn&apos;t load products: {loadError}
-          <button type="button" className="admin-link" onClick={load}>
+          Couldn&apos;t load products: {error}
+          <button type="button" className="admin-link" onClick={reload}>
             Try again
           </button>
         </p>
       ) : status === "loading" ? (
         <p className="admin-note">Loading products…</p>
-      ) : products.length === 0 ? (
+      ) : visible.length === 0 ? (
         <p className="admin-note">
           No products yet — <Link href="/admin/products/add">add the first one</Link>.
         </p>
@@ -88,7 +74,7 @@ export default function AdminProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {visible.map((product) => (
               <tr key={product.id}>
                 <td>{product.name}</td>
                 <td>{product.brand}</td>

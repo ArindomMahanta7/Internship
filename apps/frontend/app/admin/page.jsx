@@ -1,68 +1,87 @@
+"use client";
+
 import Link from "next/link";
+import { fetchAdminStats } from "../../lib/api";
+import { formatPrice } from "../../data/products";
+import { badgeClass, customerName, formatDate } from "./shared";
+import useAdminData from "./useAdminData";
 
-/* Dashboard: a few numbers at the top, then the latest orders.
- * All data is just hardcoded for now. */
-
-const stats = [
-  { title: "Total sales", value: "₹4,52,000" },
-  { title: "Orders", value: "128" },
-  { title: "Products", value: "24" },
-  { title: "Users", value: "890" },
-];
-
-const recentOrders = [
-  { id: "1001", customer: "Rahul Sharma", total: "₹1,29,999", status: "Paid" },
-  { id: "1002", customer: "Priya Verma", total: "₹17,999", status: "Shipped" },
-  { id: "1003", customer: "Amit Khan", total: "₹29,999", status: "Pending" },
-  { id: "1004", customer: "Sneha Iyer", total: "₹12,499", status: "Paid" },
-];
-
-function badgeClass(status) {
-  if (status === "Paid") return "admin-badge green";
-  if (status === "Shipped") return "admin-badge blue";
-  return "admin-badge yellow";
-}
-
+/* Dashboard: live totals from /api/admin/stats, then the five most recent
+ * orders. Everything here is read-only - status changes live on the order
+ * detail page. */
 export default function AdminDashboard() {
+  const { data, status, error, reload } = useAdminData(fetchAdminStats);
+
+  const stats = data?.stats;
+  const recentOrders = data?.recentOrders ?? [];
+
+  const cards = [
+    { title: "Total sales", value: stats ? formatPrice(stats.sales) : "—" },
+    { title: "Orders", value: stats?.orders ?? "—" },
+    { title: "Products", value: stats?.products ?? "—" },
+    { title: "Users", value: stats?.users ?? "—" },
+  ];
+
   return (
     <div>
       <h1 className="admin-title">Dashboard</h1>
 
+      {status === "error" ? (
+        <p className="admin-message admin-message--error" role="alert">
+          Couldn&apos;t load the dashboard: {error}
+          <button type="button" className="admin-link" onClick={reload}>
+            Try again
+          </button>
+        </p>
+      ) : null}
+
       <div className="admin-cards">
-        {stats.map((stat) => (
-          <div className="admin-card" key={stat.title}>
-            <p>{stat.title}</p>
-            <h2>{stat.value}</h2>
+        {cards.map((card) => (
+          <div className="admin-card" key={card.title}>
+            <p>{card.title}</p>
+            <h2>{status === "loading" ? "…" : card.value}</h2>
           </div>
         ))}
       </div>
 
       <h2 className="admin-subtitle">Recent orders</h2>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Order</th>
-            <th>Customer</th>
-            <th>Total</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {recentOrders.map((order) => (
-            <tr key={order.id}>
-              <td>
-                <Link href={`/admin/orders/${order.id}`}>#{order.id}</Link>
-              </td>
-              <td>{order.customer}</td>
-              <td>{order.total}</td>
-              <td>
-                <span className={badgeClass(order.status)}>{order.status}</span>
-              </td>
+      {status === "loading" ? (
+        <p className="admin-note">Loading orders…</p>
+      ) : recentOrders.length === 0 ? (
+        <p className="admin-note">
+          No orders yet — once customers check out, they&apos;ll show up here.
+        </p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Total</th>
+              <th>Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {recentOrders.map((order) => (
+              <tr key={order._id}>
+                <td>
+                  <Link href={`/admin/orders/${order._id}`}>
+                    {order.orderRef ?? `#${String(order._id).slice(-6)}`}
+                  </Link>
+                </td>
+                <td>{customerName(order)}</td>
+                <td>{formatDate(order.createdAt)}</td>
+                <td>{formatPrice(order.totalAmount ?? 0)}</td>
+                <td>
+                  <span className={badgeClass(order.status)}>{order.status}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <Link href="/admin/orders" className="admin-link">
         View all orders →

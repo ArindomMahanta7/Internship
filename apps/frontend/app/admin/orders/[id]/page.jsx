@@ -1,50 +1,78 @@
+"use client";
+
 import Link from "next/link";
+import { useCallback, useState } from "react";
+import { useParams } from "next/navigation";
+import { fetchAdminOrder, updateOrderStatus } from "../../../../lib/api";
+import { formatPrice } from "../../../../data/products";
+import {
+  badgeClass,
+  customerEmail,
+  customerName,
+  formatDate,
+  ORDER_STATUSES,
+} from "../../shared";
+import useAdminData from "../../useAdminData";
 
-/* Single order. Gets the order id from the URL (params is a Promise now, so
- * we await it), then shows that order's details. */
+/* One order (GET /api/admin/orders/:id), plus an admin-only status control
+ * (PATCH .../status). Checkout never collects a phone or address, so those
+ * cards from the old placeholder are gone - this shows what the API
+ * actually has.
+ *
+ * After a successful status save the fresh order from the PATCH response
+ * overrides the loaded one, so the badge/table update instantly without a
+ * refetch. */
+export default function AdminOrderDetailPage() {
+  const { id } = useParams();
 
-const orders = [
-  {
-    id: "1001",
-    customer: "Rahul Sharma",
-    phone: "9876543210",
-    address: "12 MG Road, Bengaluru",
-    date: "12 Oct 2026",
-    status: "Paid",
-    items: [
-      { name: "Samsung Galaxy S24 Ultra", qty: 1, price: "₹1,29,999" },
-    ],
-  },
-  {
-    id: "1002",
-    customer: "Priya Verma",
-    phone: "9812345678",
-    address: "45 Anna Nagar, Chennai",
-    date: "11 Oct 2026",
-    status: "Shipped",
-    items: [{ name: "realme Narzo 70 Turbo 5G", qty: 1, price: "₹17,999" }],
-  },
-  {
-    id: "1003",
-    customer: "Amit Khan",
-    phone: "9900112233",
-    address: "7 Park Street, Kolkata",
-    date: "10 Oct 2026",
-    status: "Pending",
-    items: [{ name: "Redmi Note 13 Pro+ 5G", qty: 1, price: "₹29,999" }],
-  },
-];
+  const { data, status, error, reload } = useAdminData(
+    useCallback(() => fetchAdminOrder(id), [id])
+  );
 
-function badgeClass(status) {
-  if (status === "Paid") return "admin-badge green";
-  if (status === "Shipped") return "admin-badge blue";
-  return "admin-badge yellow";
-}
+  const [override, setOverride] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saved, setSaved] = useState(false);
 
-export default async function OrderDetailPage({ params }) {
-  const { id } = await params;
+  const order = override ?? data;
 
-  const order = orders.find((o) => o.id === id);
+  async function handleStatusChange(event) {
+    const next = event.target.value;
+    setSaving(true);
+    setSaveError("");
+    setSaved(false);
+
+    try {
+      const updated = await updateOrderStatus(id, next);
+      setOverride(updated);
+      setSaved(true);
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (status === "loading") {
+    return <p className="admin-note">Loading order…</p>;
+  }
+
+  if (status === "error") {
+    return (
+      <div>
+        <h1 className="admin-title">Order</h1>
+        <p className="admin-message admin-message--error" role="alert">
+          Couldn&apos;t load this order: {error}
+          <button type="button" className="admin-link" onClick={reload}>
+            Try again
+          </button>
+        </p>
+        <Link href="/admin/orders" className="admin-link">
+          ← Back to orders
+        </Link>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -57,54 +85,102 @@ export default async function OrderDetailPage({ params }) {
     );
   }
 
+  const items = Array.isArray(order.items) ? order.items : [];
+
   return (
     <div>
       <div className="admin-head">
-        <h1 className="admin-title">Order #{order.id}</h1>
+        <h1 className="admin-title">
+          {order.orderRef ?? `Order #${String(order._id).slice(-6)}`}
+        </h1>
         <span className={badgeClass(order.status)}>{order.status}</span>
       </div>
+
+      {saveError ? (
+        <p className="admin-message admin-message--error" role="alert">
+          Couldn&apos;t update the order: {saveError}
+        </p>
+      ) : null}
+      {saved ? (
+        <p className="admin-message admin-message--ok" role="status">
+          Order updated.
+        </p>
+      ) : null}
 
       <div className="admin-cards">
         <div className="admin-card">
           <p>Customer</p>
-          <h2>{order.customer}</h2>
+          <h2>{customerName(order)}</h2>
         </div>
         <div className="admin-card">
-          <p>Phone</p>
-          <h2>{order.phone}</h2>
+          <p>Email</p>
+          <h2>{customerEmail(order)}</h2>
         </div>
         <div className="admin-card">
-          <p>Date</p>
-          <h2>{order.date}</h2>
+          <p>Placed</p>
+          <h2>{formatDate(order.createdAt)}</h2>
         </div>
         <div className="admin-card">
-          <p>Items</p>
-          <h2>{order.items.length}</h2>
+          <p>Total</p>
+          <h2>{formatPrice(order.totalAmount ?? 0)}</h2>
         </div>
       </div>
 
-      <h2 className="admin-subtitle">Shipping address</h2>
-      <p>{order.address}</p>
+      <h2 className="admin-subtitle">Status</h2>
+      <label className="admin-label" htmlFor="order-status">
+        Update status
+      </label>
+      <select
+        id="order-status"
+        className="admin-input"
+        value={order.status}
+        onChange={handleStatusChange}
+        disabled={saving}
+      >
+        {ORDER_STATUSES.map((value) => (
+          <option key={value} value={value}>
+            {value[0].toUpperCase() + value.slice(1)}
+          </option>
+        ))}
+      </select>
 
       <h2 className="admin-subtitle">Items</h2>
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Qty</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {order.items.map((item) => (
-            <tr key={item.name}>
-              <td>{item.name}</td>
-              <td>{item.qty}</td>
-              <td>{item.price}</td>
+      {items.length === 0 ? (
+        <p className="admin-note">This order has no items.</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Subtotal</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {items.map((item, index) => {
+              // `product` is populated by the API; fall back to the id if the
+              // product has since been deleted.
+              const product =
+                item.product && typeof item.product === "object"
+                  ? item.product
+                  : null;
+              const name = product
+                ? `${product.brandName} ${product.modelName}`.trim()
+                : "Product unavailable";
+
+              return (
+                <tr key={item.product?._id ?? index}>
+                  <td>{name}</td>
+                  <td>{item.quantity}</td>
+                  <td>{formatPrice(item.price ?? 0)}</td>
+                  <td>{formatPrice((item.price ?? 0) * item.quantity)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
 
       <Link href="/admin/orders" className="admin-link">
         ← Back to orders

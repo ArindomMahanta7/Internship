@@ -10,6 +10,7 @@ import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js"
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -37,6 +38,7 @@ app.use("/api/auth/", authRoutes);
 app.use("/api/product",productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
 
 /* Express 5 hands async + middleware errors here instead of crashing. */
 app.use((err, _req, res, _next) => {

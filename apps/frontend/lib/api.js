@@ -188,6 +188,43 @@ export async function deleteProduct(id) {
   return request(`/api/product/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
+/* ── admin ────────────────────────────────────────────────────────────────
+ * These hit /api/admin/*, which requires an admin session cookie. The
+ * dashboard/orders/users/analytics screens are all client components that
+ * load through these. */
+export async function fetchAdminStats() {
+  const data = await request("/api/admin/stats");
+  return data; // { stats: { sales, orders, products, users }, recentOrders }
+}
+
+export async function fetchAllOrders() {
+  const data = await request("/api/admin/orders");
+  return data.orders ?? [];
+}
+
+export async function fetchAdminOrder(id) {
+  const data = await request(`/api/admin/orders/${encodeURIComponent(id)}`);
+  return data.order;
+}
+
+export async function updateOrderStatus(id, status) {
+  const data = await request(`/api/admin/orders/${encodeURIComponent(id)}/status`, {
+    method: "PATCH",
+    body: { status },
+  });
+  return data.order;
+}
+
+export async function fetchAllUsers() {
+  const data = await request("/api/admin/users");
+  return data.users ?? [];
+}
+
+export async function fetchAnalytics() {
+  const data = await request("/api/admin/analytics");
+  return data; // { stats, monthly, topProducts }
+}
+
 /* Build a multipart body: scalar fields go in as strings, `images` (a
  * FileList or File[]) is appended under the "images" key the API expects. */
 function toFormData(fields) {

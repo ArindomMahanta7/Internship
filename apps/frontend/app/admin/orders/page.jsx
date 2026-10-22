@@ -1,84 +1,65 @@
+"use client";
+
 import Link from "next/link";
+import { fetchAllOrders } from "../../../lib/api";
+import { formatPrice } from "../../../data/products";
+import { badgeClass, customerName, formatDate } from "../shared";
+import useAdminData from "../useAdminData";
 
-/* Orders list. Hardcoded for now, each row links to its detail page. */
+/* Every order from every customer, newest first (GET /api/admin/orders).
+ * Each row links to the detail page, where the status can be changed. */
+export default function AdminOrdersPage() {
+  const { data: orders, status, error, reload } = useAdminData(fetchAllOrders);
 
-const orders = [
-  {
-    id: "1001",
-    customer: "Rahul Sharma",
-    date: "12 Oct 2026",
-    total: "₹1,29,999",
-    status: "Paid",
-  },
-  {
-    id: "1002",
-    customer: "Priya Verma",
-    date: "11 Oct 2026",
-    total: "₹17,999",
-    status: "Shipped",
-  },
-  {
-    id: "1003",
-    customer: "Amit Khan",
-    date: "10 Oct 2026",
-    total: "₹29,999",
-    status: "Pending",
-  },
-  {
-    id: "1004",
-    customer: "Sneha Iyer",
-    date: "09 Oct 2026",
-    total: "₹12,499",
-    status: "Paid",
-  },
-  {
-    id: "1005",
-    customer: "Vikram Rao",
-    date: "08 Oct 2026",
-    total: "₹2,09,998",
-    status: "Shipped",
-  },
-];
-
-function badgeClass(status) {
-  if (status === "Paid") return "admin-badge green";
-  if (status === "Shipped") return "admin-badge blue";
-  return "admin-badge yellow";
-}
-
-export default function OrdersPage() {
   return (
     <div>
       <h1 className="admin-title">Orders</h1>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Order</th>
-            <th>Customer</th>
-            <th>Date</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.id}>
-              <td>#{order.id}</td>
-              <td>{order.customer}</td>
-              <td>{order.date}</td>
-              <td>{order.total}</td>
-              <td>
-                <span className={badgeClass(order.status)}>{order.status}</span>
-              </td>
-              <td>
-                <Link href={`/admin/orders/${order.id}`}>View</Link>
-              </td>
+      {status === "error" ? (
+        <p className="admin-message admin-message--error" role="alert">
+          Couldn&apos;t load orders: {error}
+          <button type="button" className="admin-link" onClick={reload}>
+            Try again
+          </button>
+        </p>
+      ) : status === "loading" ? (
+        <p className="admin-note">Loading orders…</p>
+      ) : orders.length === 0 ? (
+        <p className="admin-note">No orders yet.</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order._id}>
+                <td>{order.orderRef ?? `#${String(order._id).slice(-6)}`}</td>
+                <td>{customerName(order)}</td>
+                <td>{formatDate(order.createdAt)}</td>
+                <td>
+                  {(order.items ?? []).reduce((n, item) => n + item.quantity, 0)}
+                </td>
+                <td>{formatPrice(order.totalAmount ?? 0)}</td>
+                <td>
+                  <span className={badgeClass(order.status)}>{order.status}</span>
+                </td>
+                <td>
+                  <Link href={`/admin/orders/${order._id}`}>View</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
