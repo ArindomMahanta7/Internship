@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthForm from "../../../components/auth/AuthForm";
 import { PersonIcon, MailIcon, LockIcon, CheckIcon } from "../../../components/icons";
-import { register } from "../../../lib/api";
+import { register, ApiError } from "../../../lib/api";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -35,15 +35,29 @@ export default function RegisterPage() {
 
   /* POST /api/auth/register - the API mails a 6-digit OTP and returns 201.
    * The account is unverified until /verify is completed, so that is where
-   * we send them (the email is passed along so the form is pre-filled). */
+   * we send them (the email is passed along so the form is pre-filled).
+   *
+   * A 503 means the account WAS created but the OTP email failed - don't
+   * strand the visitor here (re-registering would just fail); send them to
+   * /verify anyway, where "Resend code" can retry the email. */
   async function handleSubmit(values) {
-    await register({
-      name: values.fullName.trim(),
-      email: values.email.trim(),
-      password: values.password,
-    });
+    const email = values.email.trim();
 
-    router.push(`/verify?email=${encodeURIComponent(values.email.trim())}`);
+    try {
+      await register({
+        name: values.fullName.trim(),
+        email,
+        password: values.password,
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        router.push(`/verify?email=${encodeURIComponent(email)}`);
+        return;
+      }
+      throw error; // AuthForm shows this message.
+    }
+
+    router.push(`/verify?email=${encodeURIComponent(email)}`);
   }
 
   return (

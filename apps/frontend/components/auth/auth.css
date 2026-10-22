@@ -397,6 +397,29 @@
   text-decoration: underline;
 }
 
+/* ---------- resend code (/verify) ---------- */
+
+.buycart-resend {
+  margin: 0;
+  font-size: 13.5px;
+  color: rgba(226, 232, 240, 0.7);
+  text-align: center;
+}
+
+button.buycart-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.buycart-link:disabled {
+  cursor: default;
+  opacity: 0.55;
+  text-decoration: none;
+}
+
 /* ---------- "or" divider ---------- */
 
 .buycart-divider {

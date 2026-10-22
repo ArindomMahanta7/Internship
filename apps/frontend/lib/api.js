@@ -128,6 +128,16 @@ export async function verifyOtp(email, otp) {
   });
 }
 
+/* Fresh OTP when the first one expired or never arrived. Resolves with
+ * { message, alreadyVerified? } - alreadyVerified means the account is done
+ * and the caller should send the visitor to the login screen. */
+export async function resendOtp(email) {
+  return request("/api/auth/resend-otp", {
+    method: "POST",
+    body: { email },
+  });
+}
+
 export async function logout() {
   return request("/api/auth/logout", { method: "POST" });
 }

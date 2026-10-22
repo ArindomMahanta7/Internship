@@ -27,7 +27,10 @@ import "./auth.css";
  *   footer         node rendered under the panel (e.g. "Don't have an account?")
  *   dense          tighter field spacing, for forms with 4+ fields
  *   children       extra nodes rendered after the submit button, before the
- *                  social buttons (e.g. remember-me row, terms checkbox)
+ *                  social buttons (e.g. remember-me row, terms checkbox).
+ *                  May also be a function (values) => node, for content that
+ *                  needs the live form state (e.g. the resend-code control
+ *                  on /verify, which reads the email being typed).
  */
 export default function AuthForm({
   fields,
@@ -113,7 +116,7 @@ export default function AuthForm({
               {submitLabel}
             </Button>
 
-            {children}
+            {typeof children === "function" ? children(values) : children}
 
             <OAuthDivider />
             <OAuthButton provider="apple" disabled={submitting} />

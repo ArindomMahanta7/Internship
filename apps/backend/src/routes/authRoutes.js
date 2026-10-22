@@ -6,6 +6,7 @@ import {
     loginUser,
     registerUser,
     verifyEmail,
+    resendOtp,
     logoutUser
 } from "../controllers/authController.js";
 
@@ -18,6 +19,9 @@ router.post("/register", registerUser);
 
 // Verify email using OTP
 router.post("/verify-email", verifyEmail);
+
+// Get a fresh OTP when the previous one expired or never arrived
+router.post("/resend-otp", resendOtp);
 
 //login
 router.post("/login",loginUser)

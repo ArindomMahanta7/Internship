@@ -45,19 +45,63 @@ export const registerUser = async (req, res) => {
             });
         }
 
+        // Hash password (needed by both the fresh account and the
+        // "unverified account re-registering" path below)
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Check whether user already exists
         const existingUser = await User.findOne({
             email: normalizedEmail
         });
 
+        /* An account that never finished verification is a dead end if we
+         * just say "already exists": the visitor can't log in (403), can't
+         * re-register (409), and may have lost the first OTP. Issue them a
+         * fresh code instead of rejecting - only genuinely verified accounts
+         * are told to log in. */
         if (existingUser) {
-            return res.status(409).json({
-                message: "User already exists"
+            if (existingUser.verified) {
+                return res.status(409).json({
+                    message: "User already exists. Please log in."
+                });
+            }
+
+            const otp = generateOTP();
+            // Unverified accounts have no session and no way to get back in,
+            // so the fresh registration attempt wins: new name/password apply
+            // once this OTP lands (they still have to prove email ownership).
+            existingUser.name = name.trim();
+            existingUser.password = hashedPassword;
+            existingUser.otp = otp;
+            existingUser.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+            await existingUser.save();
+
+            const msg = `Welcome to our platform!
+
+Your OTP for email verification is ${otp}.
+
+This OTP expires in 5 minutes.`;
+
+            try {
+                await sendEmail(normalizedEmail, "OTP for email verification", msg);
+            } catch (emailError) {
+                console.error("Email sending failed:", emailError);
+
+                return res.status(503).json({
+                    id: existingUser._id,
+                    name: existingUser.name,
+                    email: existingUser.email,
+                    message: "Account created, but the verification email could not be sent. Please request a new OTP."
+                });
+            }
+
+            return res.status(201).json({
+                id: existingUser._id,
+                name: existingUser.name,
+                email: existingUser.email,
+                message: "You had signed up but not verified yet - we sent you a fresh OTP. Please check your email."
             });
         }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Generate OTP
         const otp = generateOTP();
@@ -150,10 +194,13 @@ export const verifyEmail = async (req, res) => {
             });
         }
 
-        // Check whether already verified
+        // Already verified: treat as success, not an error. Re-submitting
+        // (back button, double submit, stale tab) must send the visitor to
+        // the login screen instead of stranding them on /verify.
         if (user.verified) {
-            return res.status(400).json({
-                message: "Email is already verified"
+            return res.status(200).json({
+                message: "Email is already verified",
+                alreadyVerified: true
             });
         }
 
@@ -206,6 +253,93 @@ export const verifyEmail = async (req, res) => {
 
         return res.status(500).json({
             message: "Error occurred while verifying email"
+        });
+    }
+};
+
+
+// RESEND OTP
+/* The verification code only lives 5 minutes, and registering again with the
+ * same email is rejected (409) - without this endpoint a slow or failed email
+ * permanently locks the account out of the site. Generates a fresh OTP and
+ * mails it, with a 30s cooldown so it can't be used to spam inboxes. */
+export const resendOtp = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        if (typeof email !== "string" || !email.trim()) {
+            return res.status(400).json({
+                message: "Email is required"
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        // Don't reveal whether the account exists - say the same thing either
+        // way, so this can't be used to probe for registered emails.
+        const notFoundish = () =>
+            res.status(200).json({
+                message: `If an account for ${normalizedEmail} needs verification, a new code is on its way.`
+            });
+
+        const user = await User.findOne({ email: normalizedEmail });
+        if (!user) return notFoundish();
+
+        // Already verified: nothing to resend - point them at logging in.
+        if (user.verified) {
+            return res.status(200).json({
+                message: "Email is already verified. Please log in.",
+                alreadyVerified: true
+            });
+        }
+
+        // Cooldown: the current code was issued at (otpExpiry - 5 minutes).
+        const issuedAt = user.otpExpiry
+            ? user.otpExpiry.getTime() - 5 * 60 * 1000
+            : 0;
+        if (Date.now() - issuedAt < 30 * 1000) {
+            return res.status(429).json({
+                message: "Please wait a moment before requesting a new code."
+            });
+        }
+
+        const otp = generateOTP();
+
+        await User.updateOne(
+            { _id: user._id },
+            {
+                $set: {
+                    otp,
+                    otpExpiry: new Date(Date.now() + 5 * 60 * 1000)
+                }
+            }
+        );
+
+        try {
+            await sendEmail(
+                normalizedEmail,
+                "OTP for email verification",
+                `Your verification code is ${otp}.
+
+This code expires in 5 minutes.`
+            );
+        } catch (emailError) {
+            console.error("Email sending failed:", emailError);
+
+            return res.status(503).json({
+                message: "The code could not be sent right now. Please try again in a moment."
+            });
+        }
+
+        return res.status(200).json({
+            message: `A new code is on its way to ${normalizedEmail}.`
+        });
+
+    } catch (error) {
+        console.error("Resend OTP error:", error);
+
+        return res.status(500).json({
+            message: "Error occurred while resending the OTP"
         });
     }
 };
